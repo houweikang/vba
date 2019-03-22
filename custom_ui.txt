@@ -1,0 +1,33 @@
+<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui">
+
+<ribbon startFromScratch="false">
+
+    <tabs>
+
+    <tab id="sql4" label="SqlServer-4G">
+
+      <group id="g1" label="表内">
+
+<button id="bt1" label="删除辅助表" imageMso="WorkgroupAdmin" size="large" supertip="删除辅助表." onAction="SC"/>
+<button id="bt2" label="创建工作表" imageMso="FileNew" size="large" supertip="创建工作表." onAction="Csht"/>
+<button id="bt3" label="汇总" imageMso="MergeCells" size="large" supertip="汇总." onAction="HZ"/>
+<button id="bt4" label="核查" imageMso="Head" size="large" supertip="核查." onAction="核查"/>
+<button id="bt5" label="导入数据库" imageMso="SaveAndNew" size="large" supertip="导入数据库." onAction="S4G_Sqlserver"/>
+
+      </group>
+
+    </tab>
+
+  </tabs>
+
+</ribbon>
+
+</customUI>
+
+
+Public Sub  (control As IRibbonControl)
+Public Sub SC(control As IRibbonControl)
+
+  MsgBox "欢迎！"
+
+End Sub
