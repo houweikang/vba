@@ -4,15 +4,12 @@
 
     <tabs>
 
-    <tab id="sql4" label="SqlServer-4G">
+    <tab id="sql4" label="QXT">
 
-      <group id="g1" label="表内">
+      <group id="g1" label="战队同期对比">
 
-<button id="bt1" label="删除辅助表" imageMso="WorkgroupAdmin" size="large" supertip="删除辅助表." onAction="SC"/>
-<button id="bt2" label="创建工作表" imageMso="FileNew" size="large" supertip="创建工作表." onAction="Csht"/>
-<button id="bt3" label="汇总" imageMso="MergeCells" size="large" supertip="汇总." onAction="HZ"/>
-<button id="bt4" label="核查" imageMso="Head" size="large" supertip="核查." onAction="核查"/>
-<button id="bt5" label="导入数据库" imageMso="SaveAndNew" size="large" supertip="导入数据库." onAction="S4G_Sqlserver"/>
+<button id="bt1" label="战队同期对比" imageMso="WorkgroupAdmin" size="large" supertip="战队同期对比." onAction="TeamVS"/>
+<button id="bt2" label="另存为xlsx" imageMso="WorkgroupAdmin" size="large" supertip="另存为xlsx." onAction="SATeamVS"/>
 
       </group>
 

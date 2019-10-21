@@ -1,0 +1,134 @@
+Function simple_style(rng As Range) '设置区域简单格式
+With rng
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        With .Font
+                .Name = "Microsoft YaHei UI"
+                .Size = 11
+        End With
+        .Columns.AutoFit
+        .Rows.AutoFit
+End With
+End Function
+
+Function my_style(ByVal AtRange As Range, Optional ByVal i As Integer = 0, Optional ByVal j As Integer = 0)
+'(默认)i=0 区域数据较少
+'i=1 区域数据较多
+
+'(默认)j=0 不包含表头
+'j=1 一行表头
+'j=2 二行表头 一行表头加一行日期
+Dim MainRange As Range, DateRange As Range, TitleRange As Range
+AtRange.Font.Name = "Microsoft YaHei UI"
+Select Case j
+        Case 0 '无表头
+                Set MainRange = AtRange
+        
+        Case 1 '一行表头
+                With AtRange
+                        Set TitleRange = .Rows(1)
+                        Set MainRange = .Offset(1, 0).Resize(.Rows.Count - 1, .Columns.Count)
+                End With
+        Case 2  '二行表头
+                With AtRange
+                        Set TitleRange = .Rows(1)
+                        Set DateRange = .Rows(2)
+                        Set MainRange = .Offset(2, 0).Resize(.Rows.Count - 2, .Columns.Count)
+                End With
+End Select
+
+With AtRange '整体上设置居中格式
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+End With
+
+If Not TitleRange Is Nothing Then
+        With TitleRange
+                If .Cells(1).Count = 1 Then .Merge
+                .Font.Size = 16
+                .Font.Bold = True
+                .Font.Color = 7884319
+                .Borders(xlEdgeBottom).LineStyle = xlNone
+        End With
+End If
+
+If Not DateRange Is Nothing Then
+        With DateRange
+                .Cells(2).Cut .Cells(.Columns.Count)
+                .Cells(1).Resize(1, .Columns.Count - 1).Merge
+                .Cells(1).HorizontalAlignment = xlRight
+                .Cells(.Columns.Count).HorizontalAlignment = xlLeft
+                .Font.Size = 10
+                .Borders(xlEdgeBottom).LineStyle = xlNone
+        End With
+End If
+
+If Not MainRange Is Nothing Then
+        With MainRange
+                Select Case i
+                        Case 0
+                        '数据较少，2行表头
+                                With .Font
+                                    .Name = "Microsoft YaHei UI"
+                                    .Size = 11
+                                End With
+                                With .Rows(1)
+                                    .Font.Size = 13
+                                    .Font.Bold = True
+                                    .Interior.Color = 7884319
+                                    .Font.Color = 16777215
+                                End With
+                                .Rows(.Rows.Count).Font.Bold = True
+                                With .Borders(xlEdgeBottom)
+                                        .LineStyle = xlContinuous
+                                        .ThemeColor = 5
+                                        .TintAndShade = -0.499984740745262
+                                        .Weight = xlThin
+                                End With
+                                With .Borders(xlInsideHorizontal)
+                                        .LineStyle = xlContinuous
+                                        .ThemeColor = 1
+                                        .TintAndShade = -0.14996795556505
+                                        .Weight = xlThin
+                                End With
+                                With .Borders(xlEdgeRight)
+                                        .LineStyle = xlContinuous
+                                        .ThemeColor = 1
+                                        .TintAndShade = -0.14996795556505
+                                        .Weight = xlThin
+                                End With
+                                With .Borders(xlInsideVertical)
+                                    .LineStyle = xlContinuous
+                                    .ThemeColor = 1
+                                    .TintAndShade = -0.14996795556505
+                                    .Weight = xlThin
+                                End With
+                                .Columns.ColumnWidth = 15
+                                .Rows.RowHeight = 30
+                                
+                        Case 1 ' 数据较多，无表头
+                                With .Font
+                                    .Name = "Microsoft YaHei UI"
+                                    .Size = 10
+                                End With
+                                With .Rows(1)
+                                    .Font.Size = 11
+                                    .Font.Bold = True
+                                    .Interior.Color = 7884319
+                                    .Font.Color = 16777215
+                                End With
+                                If .Rows.Count > 3 Then
+                                    For j = 3 To .Rows.Count Step 2
+                                        .Rows(j).Interior.Color = 15921906
+                                    Next
+                                End If
+                                .Borders.LineStyle = xlContinuous
+                                .Borders.Weight = xlThin
+                                .Borders(xlInsideHorizontal).Color = 13224393
+                                .Borders(xlInsideVertical).Color = 13224393
+                                .Cells.EntireColumn.AutoFit
+                                .Cells.EntireRow.AutoFit
+                End Select
+        End With
+End If
+End Function

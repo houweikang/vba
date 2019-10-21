@@ -1,0 +1,55 @@
+Function chart_data(ShtName$, ChartName$, DateShtRange As Range, Optional ByVal Vert As Boolean = False, _
+        Optional ByVal xline_count As Integer = 1, Optional ByVal Tline As Boolean = False)
+'图 选择 数据区域
+'图所在表 图名 数据区域 【列为X轴】 【几行轴】 【趋势线】
+Dim i%, j%, k%, Xvalue As Range
+
+With DateShtRange
+    k = .Columns.Count
+    r = .Rows.Count
+    If Vert Then
+        Set Xvalue = .Cells(1, 2).Resize(xline_count, k - 1)
+    Else
+        Set Xvalue = .Cells(2, 1).Resize(r - 1, xline_count)
+    End If
+End With
+
+With Sheets(ShtName)
+    .Activate
+    .ChartObjects(ChartName).Activate
+End With
+
+With ActiveChart
+    j = .FullSeriesCollection.Count
+    For i = 1 To j
+        .FullSeriesCollection(1).Delete
+    Next
+    
+    On Error Resume Next
+    If Tline Then .SetElement (msoElementTrendlineNone)
+    On Error GoTo 0
+    
+    If Vert Then  '以列为X轴
+    
+        For i = 1 To r - xline_count
+            .SeriesCollection.NewSeries
+            .FullSeriesCollection(i).Name = DateShtRange.Cells(i, 1).Offset(xline_count, 0)
+            .FullSeriesCollection(i).Values = DateShtRange.Cells(i, 1).Offset(xline_count, 1).Resize(1, k - 1)
+            .FullSeriesCollection(i).XValues = Xvalue
+            If Tline Then .FullSeriesCollection(i).Trendlines.Add Type:= _
+            xlLinear, Name:="线性 (" & DateShtRange.Cells(i, 1).Offset(xline_count, 0).Value & ")"
+        Next
+    
+    Else    '以行为X轴
+        For i = 1 To k - xline_count
+            .SeriesCollection.NewSeries
+            .FullSeriesCollection(i).Name = DateShtRange.Cells(1, i).Offset(0, xline_count)
+            .FullSeriesCollection(i).Values = DateShtRange.Cells(1, i).Offset(1, xline_count).Resize(r - 1, 1)
+            .FullSeriesCollection(i).XValues = Xvalue
+            If Tline Then .FullSeriesCollection(i).Trendlines.Add Type:= _
+            xlLinear, Name:="线性 (" & DateShtRange.Cells(1, i).Offset(0, xline_count).Value & ")"
+        Next
+    End If
+        
+End With
+End Function

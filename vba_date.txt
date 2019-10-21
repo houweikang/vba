@@ -1,0 +1,21 @@
+Function DeclareDate(input_date#) As Boolean
+Dim wk%
+'input_date = CDate(InputBox("请输入需对比当月日期：", , Date - 1)) '当月终止日期
+DCF = CDate(input_date) '当月终止日期
+dys = Day(CDate(DCF))  '天数
+DCS = DCF - dys + 1 '当月起始日期
+wk = Weekday(DCS, vbMonday)     '当前月起始日期对应星期
+                                                
+DLF = DateSerial(Year(DCF), Month(DCF) - 1, Day(DCF)) '日对比月终止日期
+DLS = DateSerial(Year(DCS), Month(DCS) - 1, Day(DCS)) '日对比月起始日期
+
+DLS_W = DLS
+Do Until Weekday(DLS_W, vbMonday) = wk
+    DLS_W = DLS_W + 1 '星期对比月起始日期
+Loop
+DLF_W = DLS_W + dys '星期对比终止日期
+
+l_month = Format(CDate(DLS), "m月")
+c_month = Format(CDate(DCS), "m月")
+DeclareDate = True
+End Function

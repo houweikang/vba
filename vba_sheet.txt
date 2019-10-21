@@ -1,0 +1,38 @@
+Function sht_initial(sht_name$, Optional ByVal clean As Boolean = True)  '检测是否存在表，不存在新建；是否清空（是）
+If TypeName(Application.Evaluate(sht_name & "!A1")) = "Error" Then
+    Worksheets.Add(after:=Sheets(Sheets.Count)).Name = sht_name
+else
+	If clean = True Then Sheets(sht_name).Cells.Clear
+End If
+End Function
+
+
+Function Mat(ColName$, rg As Range) As Integer '字段名所处列数
+Dim rng As Range
+For Each rng In rg
+    Mat = Mat + 1
+    If rng = ColName Then Exit Function
+Next
+Mat = 0
+End Function
+
+
+Function MergeRanges(ranges As Range) '区域内每列相同相邻单元格合并
+Dim i&, j&
+Application.DisplayAlerts = False
+With ranges
+For j = 1 To .Columns.Count
+        For i = .Rows.Count To 1 Step -1
+                If .Cells(i, j).Value = .Cells(i - 1, j).Value Then
+                        .Cells(i - 1, j).Resize(2, 1).Merge
+                End If
+        Next
+Next
+End With
+Application.DisplayAlerts = True
+End Function
+
+Function one_data(rg As Range) '去重
+rg.RemoveDuplicates 1
+End Function
+

@@ -1,0 +1,7 @@
+Sub 判断工作簿中汇总表存在否()
+If TypeName(Application.Evaluate("汇总!A1")) = "Error" Then
+        MsgBox "汇总表不存在"
+    Else
+        MsgBox "汇总表已存在"
+    End If
+End Sub

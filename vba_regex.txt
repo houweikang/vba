@@ -1,0 +1,15 @@
+Sub gkjl()
+Dim YJ As Object,YJ_arr,a$
+a="QXYJMA47_平常心(15234360498)(k1r6xzf6ml)"
+Set YJ = CreateObject("vbscript.regexp")
+With YJ
+	.Global = True
+	.Pattern = "(.*YJ.*?)_(.*?)\((\d{11})\)"
+	If YJ.test(a) Then
+		Set YJ_arr = YJ.Execute(a)
+		YJ_arr(0).submatches(0)  'QXYJMA47
+		YJ_arr(0).submatches(1)	 '平常心
+		YJ_arr(0).submatches(2)	 '15234360498
+	end if
+End With
+end sub

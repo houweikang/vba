@@ -1,0 +1,27 @@
+Function folder_path(mypath$) As String '文件夹路径
+With Application.FileDialog(msoFileDialogFolderPicker)
+    .InitialFileName = mypath '"e:\报表\所有数据信息\"
+     If .Show = False Then Exit Function
+     folder_path = .SelectedItems(1) & "\"
+End With         '把文件路径定义给变量
+End Function
+
+Function file_path(mypath$) As String '文件路径
+With Application.FileDialog(msoFileDialogFilePicker)
+    .InitialFileName = mypath '"e:\报表\所有数据信息\1.xlsx"
+     If .Show = False Then Exit Function
+     file_path = .SelectedItems(1) & "\"
+End With         '把文件径定义给变量
+End Function
+
+Function path_exists(apath$) As Boolean  '检测路径是否存在
+dim fso as object
+
+Set fso = CreateObject("Scripting.FileSystemObject")
+If fso.fileexists(apath) or fso.fileexists(apath) Then
+	path_exists = True
+Else
+	path_exists = False
+End If
+
+End Function
