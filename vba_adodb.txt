@@ -1,0 +1,35 @@
+Sub impdata1()
+Dim arr
+sDate = "2019/6/1"
+fDate = "2019/6/25"
+Dim cnn As Object
+With activesheet
+        .UsedRange.ClearContents
+        .[a1].Resize(1, 13) = Array("学院", "地区", "战队", "小组", "员工号", "推广专员", "提交时间", "时刻", "时间段", "日", "周", "月", "年")
+    Dim SQL$, mypath$, MyFile$, wk$, a, i%, t$, m%, N%
+    mypath = "f:\报表\old\201906\"
+    MyFile = Dir(mypath & "*.xls*")
+    Set cnn = CreateObject("adodb.connection")
+    Do While MyFile <> ""
+        If MyFile <> ThisWorkbook.Name Then
+            N = N + 1
+            If N = 1 Then cnn.Open "Provider=Microsoft.ACE.OLEDB.12.0;Extended Properties=Excel 8.0;Data Source=" & mypath & MyFile
+                m = m + 1
+                If m > 49 Then
+                    .[a1048576].End(xlUp).Offset(1).CopyFromRecordset cnn.Execute(SQL)
+                    m = 1
+                    SQL = ""
+                End If
+                If Len(SQL) Then SQL = SQL & " union all "
+                SQL = SQL & "select [推广专员-所属学院],[推广专员-所属地区],[推广专员-所属战队],[推广专员-所属小组],[推广专员-员工号],[推广专员],[提交时间]," & _
+                 "hour(Replace([提交时间], '.0', '')),hour(Replace([提交时间], '.0', '')),Day(Replace([提交时间], '.0', '')),  datepart('ww',Replace([提交时间], '.0', ''),2) ,month(Replace([提交时间], '.0', '')) ,year(Replace([提交时间], '.0', '')) " & _
+                 "from [Excel 8.0;Database=" & mypath & MyFile & "].[" & "所有数据信息$a1:y1048576] where format(Replace([提交时间], '.0', ''),'yyyy/m/d') >= '" & sDate & "' and format(Replace([提交时间], '.0', ''),'yyyy/m/d')  <='" & fDate & "'"
+'           Debug.Print SQL
+        End If
+        MyFile = Dir()
+    Loop
+    If Len(SQL) Then .[a1048576].End(xlUp).Offset(1).CopyFromRecordset cnn.Execute(SQL)
+    cnn.Close
+    Set cnn = Nothing
+End With
+End Sub

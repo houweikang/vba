@@ -1,0 +1,97 @@
+‘’‘ 追加到数据库
+Sub Insert_Db_TG()
+Dim SV$, DB$, UN$, PW$, DBTB$, SQL$
+Application.ScreenUpdating = False
+        Dim cn, rs, n, cnStr$, wsName$
+        Set cn = CreateObject("ADODB.Connection")
+        Set rs = CreateObject("ADODB.RecordSet")
+        On Error GoTo errHandle
+        cnStr = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & ActiveWorkbook.FullName & ";Extended Properties=""Excel 12.0;HDR=YES"";"""
+        cn.Open cnStr
+        SV = "X8E246DWZ21YK7A"   '数据库服务器名称
+        DB = "趣学堂"           '数据库名称
+        UN = "sa"            '数据库连接用户名
+        PW = "h123"  '数据库连接密码
+        DBTB = "所有数据信息"   '数据库内表名
+        SQL = "insert into [odbc;Driver={SQL Server};Server=" & SV & ";DataBase=" & DB & ";Uid=" & UN & ";Pwd=" & PW & "].[" & DBTB & "] Select * from [" & ActiveSheet.Name & "$]"
+        Set rs = cn.Execute(SQL, n)
+        If n > 0 Then
+                MsgBox "成功执行" & n & "条数据!", vbInformation, "提醒"
+        Else
+                MsgBox "未执行成功！"
+        End If
+        cn.Close
+        Set rs = Nothing
+        Set cn = Nothing
+Application.ScreenUpdating = True
+        Exit Sub
+errHandle:
+        MsgBox "数据库连接失败或者发生不可预料的错误！错误号:" & Err.Number & ",错误信息:" & Err.Description, vbInformation, "提醒您"
+End Sub
+
+’‘’从数据库导出
+Sub CheckDayNum_Tg()
+Dim dy$, st$, ft$, SV$, DB$, UN$, PW$, DBTB$, SQL$
+Application.ScreenUpdating = False
+dy = InputBox("请输入需要查询日期", , Date & "-" & Date)
+st = Split(dy, "-")(0)
+ft = Split(dy, "-")(1)
+
+If TypeName(Application.Evaluate("数据条数!A1")) = "Error" Then Worksheets.Add(after:=Sheets(Sheets.Count)).Name = "数据条数"
+With Sheets("数据条数")
+        .Cells.Clear
+        .[a1].Resize(1, 2) = Array("日期", "推广量")
+End With
+SQL = "select convert(date,[提交时间]), count(*) from [所有数据信息] where convert(date,[提交时间]) between '" & st & "' and '" & ft & "' group by convert(date,[提交时间]) order by convert(date,[提交时间])"
+Call Sl_Db(SQL)
+Application.ScreenUpdating = True
+End Sub
+
+Public Sub Sl_Db(SQL$)
+Dim cn, rs, n, cnStr$, wsName$, SV$, DB$, UN$, PW$, DBTB$
+        Set cn = CreateObject("ADODB.Connection")
+        Set rs = CreateObject("ADODB.RecordSet")
+        On Error GoTo errHandle
+        SV = "X8E246DWZ21YK7A"   '数据库服务器名称
+        DB = "趣学堂"           '数据库名称
+        UN = "sa"            '数据库连接用户名
+        PW = "h123"  '数据库连接密码
+        DBTB = "所有数据信息"   '数据库内表名
+        cnStr = "Provider=SQLOLEDB;Server=" & SV & ";DataBase=" & DB & ";Uid=" & UN & ";Pwd=" & PW
+        cn.Open cnStr
+        rs.Open SQL, cn
+        ActiveSheet.[a2].CopyFromRecordset rs
+        cn.Close
+        Set rs = Nothing
+        Set cnn = Nothing
+        Exit Sub
+errHandle:
+        MsgBox "数据库连接失败或者发生不可预料的错误！错误号:" & Err.Number & ",错误信息:" & Err.Description, vbInformation, "提醒您"
+End Sub
+
+
+
+Private Const SV_s$ = "Z944Y36B2OB0K92"   #筛选1个数
+Private Const DB_s$ = "QXT"
+Private Const UN_s$ = "sa"
+Private Const PW_s$ = "houweikang123"
+Function Sl_Db(sql$, dest_rg As Range)
+Dim cn, rs, n, cnStr$, wsName$, SV$, DB$, UN$, PW$, DBTB$
+        Set cn = CreateObject("ADODB.Connection")
+        Set rs = CreateObject("ADODB.RecordSet")
+        On Error GoTo errHandle
+        SV = SV_s   '数据库服务器名称
+        DB = DB_s           '数据库名称
+        UN = UN_s            '数据库连接用户名
+        PW = PW_s  '数据库连接密码
+        cnStr = "Provider=SQLOLEDB;Server=" & SV & ";DataBase=" & DB & ";Uid=" & UN & ";Pwd=" & PW
+        cn.Open cnStr
+        rs.Open sql, cn
+        dest_rg.CopyFromRecordset rs
+        cn.Close
+        Set rs = Nothing
+        Set cnn = Nothing
+        Exit Function
+errHandle:
+        MsgBox "数据库连接失败或者发生不可预料的错误！错误号:" & Err.Number & ",错误信息:" & Err.Description, vbInformation, "提醒您"
+End Function

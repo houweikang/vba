@@ -1,0 +1,13 @@
+Function zd_to_bm(rg As Range)
+MyReplace rg, "1战队", "运营一部"
+MyReplace rg, "战队", "部门"
+End Function
+
+Function bm_to_zd(rg As Range)
+MyReplace rg,  "运营一部","1战队"
+MyReplace rg, "部门", "战队"
+End Function
+
+Function MyReplace(rg As Range, old_content As String, new_content As String)
+rg.replace What:=old_content, Replacement:=new_content
+End Function

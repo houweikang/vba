@@ -19,3 +19,47 @@ l_month = Format(CDate(DLS), "m月")
 c_month = Format(CDate(DCS), "m月")
 DeclareDate = True
 End Function
+
+#月份计算
+Function date_monthes(dt$) As Variant
+Dim arr_dt(3)
+
+arr_dt(0) = DateSerial(Year(dt), Month(dt), 1)
+
+arr_dt(2) = DateSerial(Year(arr_dt(0)), Month(arr_dt(0)) + 1, 1)
+
+arr_dt(1) = DateSerial(Year(arr_dt(2)), Month(arr_dt(2)), Day(arr_dt(2)) - 1)
+
+arr_dt(3) = Format(CDate(DateSerial(Year(arr_dt(2)), Month(arr_dt(2)) + 1, 1)) - 1, "yyyy/m/d")
+date_monthes = arr_dt
+End Function
+
+
+Function HolidayR() As Range '假期区域
+Dim HolidayRange As Range
+With Sheets("holidays")
+        ar = .Cells(Rows.Count, 1).End(3).Row
+        If .[a2] <> "" Then Set HolidayRange = .Range(.[a2], .Cells(ar, 1))
+End With
+Set HolidayR = HolidayRange
+End Function
+
+Function work_days(start_date$, final_date$, Optional ByVal HolidayRng As Range = Nothing) As Integer '工作天数
+Dim gzr%, ts%
+If HolidayRng Is Nothing Then
+        gzr = Application.NetworkDays_Intl(start_date, final_date, "0000001")
+Else
+        gzr = Application.NetworkDays_Intl(start_date, final_date, "0000001", HolidayRng)
+End If
+work_days = gzr
+End Function
+
+Function all_days(start_date$, final_date$, Optional ByVal HolidayRng As Range = Nothing) As Integer '所有天数
+Dim gzr%, ts%
+If HolidayRng Is Nothing Then
+        ts = Application.NetworkDays_Intl(start_date, final_date, "0000000")
+Else
+        ts = Application.NetworkDays_Intl(start_date, final_date, "0000000", HolidayRng)
+End If
+all_days = ts
+End Function

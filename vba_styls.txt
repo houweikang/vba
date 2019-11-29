@@ -1,3 +1,24 @@
+Function fun_MergeRanges(ranges As Range) '合并上下相同的单元格
+Dim i&, j&
+Application.DisplayAlerts = False
+With ranges
+For i = .Rows.Count To 1 Step -1
+            For j = 1 To .Columns.Count
+                If j = 1 Then
+                    If .Cells(i, j).Value = .Cells(i - 1, j).Value Then
+                            .Cells(i - 1, j).Resize(2, 1).Merge
+                    End If
+                Else
+                    If .Cells(i, j).Value = .Cells(i - 1, j).Value And .Cells(i, j - 1).MergeCells = True Then
+                            .Cells(i - 1, j).Resize(2, 1).Merge
+                    End If
+                End If
+            Next
+Next
+End With
+Application.DisplayAlerts = True
+End Function
+
 Function simple_style(rng As Range) '设置区域简单格式
 With rng
         .HorizontalAlignment = xlCenter
@@ -131,4 +152,23 @@ If Not MainRange Is Nothing Then
                 End Select
         End With
 End If
+End Function
+
+#粗体
+Function fun_bold_range(ranges As Range, feature$, Optional ByVal vert As Boolean = False)
+Dim i&, j&
+    For Each rg In ranges
+        If rg.Value Like "*" & feature & "*" Then
+            If vert = True Then rg.EntireColumn.Font.Bold = True
+            If vert = False Then rg.EntireRow.Font.Bold = True
+        End If
+    Next
+End Function
+
+#替换空白为0
+Function ReplaceSpace0(ranges As Range)
+dim rg as range
+For Each rg In ranges
+	If rg.Value ="" Then rg.value = 0
+Next
 End Function
