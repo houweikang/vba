@@ -70,8 +70,8 @@ errHandle:
 End Sub
 
 
-
-Private Const SV_s$ = "Z944Y36B2OB0K92"   #筛选1个数
+#连接数据库
+Private Const SV_s$ = "Z944Y36B2OB0K92"
 Private Const DB_s$ = "QXT"
 Private Const UN_s$ = "sa"
 Private Const PW_s$ = "houweikang123"
