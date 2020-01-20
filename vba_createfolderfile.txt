@@ -1,0 +1,66 @@
+Function MyAddNowbook(WbPath$, WbTypeName$) As Boolean
+Dim Nowbook As Workbook
+Dim myNewWorkbook As Integer
+Dim mypath$, fso As Object, FullName$
+Set fso = CreateObject("scripting.filesystemobject")
+myNewWorkbook = Application.SheetsInNewWorkbook
+Application.SheetsInNewWorkbook = 1
+If Not IsDate(WbPath) Then
+    MsgBox "参数非日期，未新建文件！"
+    Exit Function
+End If
+mypath = RootDir & Format(WbPath, "/yyyy") & Format(WbPath, "/yyyymm") & Format(WbPath, "/yyyymmdd")
+If Not fso.FolderExists(mypath) Then
+    MsgBox "路径不存在，无法创建文件！"
+    Exit Function
+    MyAddNowbook = False
+End If
+
+WbName = Format(WbPath, "yyyymmdd") & WbTypeName & ".xlsx"
+
+FullName = mypath & "/" & WbName
+
+Dim i%
+i = 1
+Do Until Not fso.FileExists(FullName)
+    FullName = mypath & "/" & Format(WbPath, "yyyymmdd") & WbTypeName & "(" & i & ").xlsx"
+    i = i + 1
+Loop
+With Workbooks.Add
+    .Sheets(1).Name = "Delete"
+    .SaveAs Filename:=FullName
+End With
+
+Application.SheetsInNewWorkbook = myNewWorkbook
+MyAddNowbook = True
+End Function
+
+
+
+Function CreateFolder(dt_path$)
+Dim FPath$, fso As Object, i%, j%, k%
+Set fso = CreateObject("scripting.filesystemobject")
+FirstPath = RootDir
+If Not IsDate(dt_path) Then
+    MsgBox "参数非日期！未创建路径！"
+    Exit Function
+End If
+YearPath = FirstPath & Format(dt_path, "/yyyy")
+MonthPath = YearPath & Format(dt_path, "/yyyymm")
+DayPath = MonthPath & Format(dt_path, "/yyyymmdd")
+arr_path = Array(FirstPath, YearPath, MonthPath, DayPath)
+For i = 0 To UBound(arr_path)
+    If Not fso.FolderExists(arr_path(i)) Then fso.CreateFolder (arr_path(i))
+Next
+Set fso = Nothing
+End Function
+
+
+
+Function CreateFolderFile(WbPath$, WbName$) As Boolean
+'if Application.Run "DataBase_QXT.xlam!CreateFolderFile" , WbPath, WbName
+    CreateFolder WbPath
+    CreateFolderFile = MyAddNowbook(WbPath, WbName)
+End Function
+
+

@@ -1,55 +1,79 @@
-Function chart_data(ShtName$, ChartName$, DateShtRange As Range, Optional ByVal Vert As Boolean = False, _
-        Optional ByVal xline_count As Integer = 1, Optional ByVal Tline As Boolean = False)
-'图 选择 数据区域
-'图所在表 图名 数据区域 【列为X轴】 【几行轴】 【趋势线】
-Dim i%, j%, k%, Xvalue As Range
-
-With DateShtRange
-    k = .Columns.Count
-    r = .Rows.Count
-    If Vert Then
-        Set Xvalue = .Cells(1, 2).Resize(xline_count, k - 1)
-    Else
-        Set Xvalue = .Cells(2, 1).Resize(r - 1, xline_count)
-    End If
-End With
-
-With Sheets(ShtName)
-    .Activate
-    .ChartObjects(ChartName).Activate
-End With
-
-With ActiveChart
-    j = .FullSeriesCollection.Count
-    For i = 1 To j
-        .FullSeriesCollection(1).Delete
-    Next
-    
-    On Error Resume Next
-    If Tline Then .SetElement (msoElementTrendlineNone)
-    On Error GoTo 0
-    
-    If Vert Then  '以列为X轴
-    
-        For i = 1 To r - xline_count
-            .SeriesCollection.NewSeries
-            .FullSeriesCollection(i).Name = DateShtRange.Cells(i, 1).Offset(xline_count, 0)
-            .FullSeriesCollection(i).Values = DateShtRange.Cells(i, 1).Offset(xline_count, 1).Resize(1, k - 1)
-            .FullSeriesCollection(i).XValues = Xvalue
-            If Tline Then .FullSeriesCollection(i).Trendlines.Add Type:= _
-            xlLinear, Name:="线性 (" & DateShtRange.Cells(i, 1).Offset(xline_count, 0).Value & ")"
-        Next
-    
-    Else    '以行为X轴
-        For i = 1 To k - xline_count
-            .SeriesCollection.NewSeries
-            .FullSeriesCollection(i).Name = DateShtRange.Cells(1, i).Offset(0, xline_count)
-            .FullSeriesCollection(i).Values = DateShtRange.Cells(1, i).Offset(1, xline_count).Resize(r - 1, 1)
-            .FullSeriesCollection(i).XValues = Xvalue
-            If Tline Then .FullSeriesCollection(i).Trendlines.Add Type:= _
-            xlLinear, Name:="线性 (" & DateShtRange.Cells(1, i).Offset(0, xline_count).Value & ")"
-        Next
-    End If
+Function MyCharts(ChartName$, ChartRng As Range _
+, Optional ByVal ChartTitleName As String = "" _
+, Optional ByVal ChartType As XlChartType = xlColumnClustered _
+, Optional ByVal SizeSite As Variant _
+, Optional ByVal ChartPlotBy = xlColumns _
+, Optional ByVal DataLabel As Integer = 0 _
+, Optional ByVal Legend As Integer = 0 _
+, Optional ByVal Datatable As Boolean = True _
+, Optional MyChart_Type_xlLine = 0 _
+, Optional MyChart_AxisGroup = 0)  '添加图
+'Application.Run "DataBase_QXT.xlam!MyCharts", ChartTitleName,ChartRng,DataCount
+Dim MyChart As ChartObject
+On Error Resume Next     '如出错,则从出错行下一行开始执行
+ActiveSheet.ChartObjects(ChartName).Delete
+With ActiveSheet
+    Set MyChart = .ChartObjects.Add(SizeSite(0), SizeSite(1), SizeSite(2), SizeSite(3))
+    MyChart.Name = ChartName
+    With MyChart.Chart
+         .ChartType = ChartType     '图表类型为xlLineMarkers_数据点折线图
+        .SetSourceData Source:=ChartRng, PlotBy:=ChartPlotBy  'xlRows;xlColumns
         
+        If ChartTitleName Then
+            .HasTitle = True
+            .ChartTitle.Characters.Text = ChartTitleName
+        Else
+            .HasTitle = False
+        End If
+        
+        If DataLabel > 0 Then
+            .ApplyDataLabels ShowValue:=True
+            If DataLabel = 1 Then
+                .SetElement (msoElementDataLabelTop)
+            ElseIf DataLabel = 2 Then
+                .SetElement (msoElementDataLabelCenter)
+            ElseIf DataLabel = 3 Then
+                .SetElement (msoElementDataLabelBottom)
+            ElseIf DataLabel = 4 Then
+                .SetElement (msoElementDataLabelLeft)
+            ElseIf DataLabel = 5 Then
+                .SetElement (msoElementDataLabelRight)
+            End If
+        ElseIf DataLabel = 0 Then
+            .SetElement (msoElementDataLabelNone)
+        End If
+        
+        If Legend > 0 Then
+            If Legend = 1 Then
+                .SetElement (msoElementLegendTop)
+            ElseIf Legend = 2 Then
+                .SetElement (msoElementLegendCenter)
+            ElseIf Legend = 3 Then
+                .SetElement (msoElementLegendBottom)
+            ElseIf Legend = 4 Then
+                .SetElement (msoElementLegendLeft)
+            ElseIf Legend = 5 Then
+                .SetElement (msoElementLegendRight)
+            End If
+        ElseIf Legend = 0 Then
+            .SetElement (msoElementLegendNone)
+        End If
+        
+        If Datatable Then
+            .SetElement (msoElementDataTableWithLegendKeys)
+        Else
+            .SetElement (msoElementDataTableNone)
+        End If
+        
+        If MyChart_Type_xlLine <> 0 Then .FullSeriesCollection(MyChart_Type_xlLine).ChartType = xlLine  '第MyChart_Type_xlLine列数据为折线图
+        If MyChart_AxisGroup <> 0 Then .FullSeriesCollection(MyChart_AxisGroup).AxisGroup = 2            '第MyChart_AxisGroup列为第二刻度坐标
+
+        .ChartTitle.Font.Name = "微软雅黑"
+        .Legend.Font.Name = "微软雅黑"
+        .Datatable.Font.Name = "微软雅黑"
+        .SetElement (msoElementPrimaryValueGridLinesNone)
+    End With
+    MyChart.Select
 End With
+Set MyChart = Nothing
 End Function

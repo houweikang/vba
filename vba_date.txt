@@ -35,13 +35,13 @@ date_monthes = arr_dt
 End Function
 
 
-Function HolidayR() As Range '假期区域
+Function HolidayRng() As Range '假期区域
 Dim HolidayRange As Range
 With Sheets("holidays")
         ar = .Cells(Rows.Count, 1).End(3).Row
         If .[a2] <> "" Then Set HolidayRange = .Range(.[a2], .Cells(ar, 1))
 End With
-Set HolidayR = HolidayRange
+Set HolidayRng = HolidayRange
 End Function
 
 Function work_days(start_date$, final_date$, Optional ByVal HolidayRng As Range = Nothing) As Integer '工作天数

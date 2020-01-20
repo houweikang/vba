@@ -1,5 +1,30 @@
-Function sht_initial(sht_name$, Optional ByVal clean As Boolean = True, Optional ByVal grid_line As Boolean = True)  '检测是否存在表，不存在新建；是否清空（是）；是否清除网格线（否）
-If TypeName(Application.Evaluate(sht_name & "!A1")) = "Error" Then
+Function sheet_data(sht_name$, dts$, sql$ _
+, Optional ByVal DataMuchOrLittle As Integer = 1 _
+, Optional ByVal TitleRows As Integer = 2 _
+, Optional ByVal ShtTabColor$ = "")
+'Application.Run "DataBase_QXT.xlam!sheet_data",sht_name, dts, sql
+Application.Run "DataBase_QXT.xlam!sht_initial", sht_name, True, False '新建表
+With Sheets(sht_name)
+    With .[a1]
+        .Value = sht_name
+        .Offset(1, 0).Resize(1, 2) = Array("统计时间：", dts)
+        Application.Run "DataBase_QXT.xlam!SelectDBQxt_v1", sql, .Offset(2, 0)
+    End With
+    Application.Run "DataBase_QXT.xlam!zd_to_bm", .UsedRange
+    Application.Run "DataBase_QXT.xlam!MyStyle", .UsedRange, DataMuchOrLittle, TitleRows  '整体格式
+    If ShtTabColor = "R" Then
+        Application.Run "DataBase_QXT.xlam!ShtTabColor_Red"
+    ElseIf ShtTabColor = "G" Then
+        Application.Run "DataBase_QXT.xlam!ShtTabColor_Green"
+    End If
+End With
+End Function
+
+
+Function sht_initial(sht_name$, Optional ByVal clean As Boolean = True, Optional ByVal grid_line As Boolean = True)
+'Application.Run "DataBase_QXT.xlam!sht_initial",sht_name, clean, grid_line
+'检测是否存在表，不存在新建；是否清空（是）；是否清除网格线（否）
+If TypeName(Application.Evaluate("'" & sht_name & "'!A1")) = "Error" Then
     Worksheets.Add(after:=Sheets(Sheets.Count)).Name = sht_name
 Else
     If clean = True Then Sheets(sht_name).Cells.Clear
@@ -9,57 +34,47 @@ If Not grid_line Then
     ActiveWindow.DisplayGridlines = False
 End If
 End Function
-
-
-Function Mat(ColName$, rg As Range) As Integer '字段名所处列数
-Dim rng As Range
-For Each rng In rg
-    Mat = Mat + 1
-    If rng = ColName Then Exit Function
-Next
-Mat = 0
-End Function
-
-
-Function fun_MergeRanges(ranges As Range)
-Dim i&, j&
+Function DelShts(Except_ShtInd%)
+'Application.Run "DataBase_QXT.xlam!DelShts",Except_ShtInd
+Dim CountShts%, i%, sht_name$, sht
 Application.DisplayAlerts = False
-With ranges
-For i = .Rows.Count To 1 Step -1
-            For j = 1 To .Columns.Count
-                If j = 1 Then
-                    If .Cells(i, j).Value = .Cells(i - 1, j).Value Then
-                            .Cells(i - 1, j).Resize(2, 1).Merge
-                    End If
-                Else
-                    If .Cells(i, j).Value = .Cells(i - 1, j).Value And .Cells(i, j - 1).MergeCells = True Then
-                            .Cells(i - 1, j).Resize(2, 1).Merge
-                    End If
-                End If
-            Next
-Next
+With ActiveWorkbook
+    CountShts = .Sheets.Count
+    If Except_ShtInd = 100 Then
+        sht_name = .Sheets(CountShts).Name
+    ElseIf Except_ShtInd <= CountShts Then
+        sht_name = .Sheets(Except_ShtInd).Name
+    End If
+    For Each sht In .Sheets
+        If sht.Name <> sht_name Then sht.Delete
+    Next
 End With
 Application.DisplayAlerts = True
 End Function
 
-Function one_data(rg As Range) '去重
-rg.RemoveDuplicates 1
+
+Function ShtTabColor(ShtInd%, Corlor&)
+'Application.Run "DataBase_QXT.xlam!ShtTabColor",ShtInd,Corlor
+Dim CountShts%, ShtName$
+With ActiveWorkbook
+    CountShts = .Sheets.Count
+    If ShtIns = 0 Then
+        ShtName = .ActiveSheet.Name
+    ElseIf ShtIns <= CountShts Then
+        ShtName = .Sheets(ShtIns).Name
+    ElseIf ShtInd = 100 Then
+        ShtName = .Sheets(CountShts).Name
+    End If
+    .Sheets(ShtName).Tab.Color = Corlor
+End With
 End Function
 
-function saveas_report()
-Dim mypath$, Curday$
-Curday = Sheets(1).Cells(2, Columns.Count).End(xlToLeft).Value
 
-Curday = Split(Curday, " ")(0)
-With Application.FileDialog(msoFileDialogFolderPicker)
-     .InitialFileName = "e:\报表\推广业绩统计晨报or晚报\"
-     If .Show = False Then Exit Sub
-     mypath = .SelectedItems(1) & "\"
-End With         '把文件路径定义给变量
-ThisWorkbook.Save
-Application.DisplayAlerts = False
-Sheets.Copy
-ActiveWorkbook.SaveAs mypath & "推广业绩统计晨(晚)报" & Format(Curday, "yyyymmdd") & ".xlsx", FileFormat:=xlOpenXMLWorkbook, CreateBackup:=False
-ActiveWorkbook.Close True
-Application.DisplayAlerts = True
-End Sub
+Function ShtTabColor_Red()
+Application.Run "DataBase_QXT.xlam!ShtTabColor", 0, 7697919
+End Function
+
+
+Function ShtTabColor_Green()
+Application.Run "DataBase_QXT.xlam!ShtTabColor", 0, 11854022
+End Function

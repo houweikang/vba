@@ -70,6 +70,42 @@ errHandle:
 End Sub
 
 
+#从数据库导出数据到excel表 包含列名
+Function SelectDBQxt_v1(sql As String, AtRange As Range, Optional ByVal Tip As Boolean = False) As Boolean
+'Application.Run "DataBase_QXT.xlam!SelectDBQxt_v1", SQL,AtRange
+If Not LCase(Trim(sql)) Like "select*" Then
+'    Debug.Print LCase(Trim(sql))
+    MsgBox "非筛选语句，请检测！"
+    SelectDBQxt = False
+    Exit Function
+End If
+Dim rs, cn
+    Set rs = CreateObject("ADODB.RecordSet")
+    On Error GoTo errHandle
+    Set cn = Application.Run("DataBase_QXT.xlam!ConnectDBQxt")
+    rs.Open sql, cn, 1, 1
+    For i = 0 To rs.Fields.Count - 1 '逐个字段
+        AtRange.Offset(0, i) = rs.Fields(i).Name '取字段名
+    Next i
+    AtRange.Offset(1, 0).CopyFromRecordset rs
+    If Tip = True Then
+        If rs.RecordCount > 0 Then
+                MsgBox "成功筛选并粘贴" & rs.RecordCount & "条数据!", vbInformation, "提醒"
+        Else
+                MsgBox "未执行成功！"
+        End If
+    End If
+    Set rs = Nothing
+    Set cnn = Nothing
+    SelectDBQxt = True
+    Exit Function
+errHandle:
+    MsgBox "数据库连接失败或者发生不可预料的错误！错误号:" & Err.Number & ",错误信息:" & Err.Description, vbInformation, "提醒您"
+    SelectDBQxt = False
+End Function
+
+
+
 #连接数据库
 Private Const SV_s$ = "Z944Y36B2OB0K92"
 Private Const DB_s$ = "QXT"
